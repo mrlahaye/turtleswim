@@ -41,6 +41,8 @@ var mainState={
         //Create a timer to display the pipes
         this.timer = game.time.events.loop(1500, this.addRowOfPipes, this);
         
+        //Set default anchor on the bird sprite
+        this.bird.anchor.setTo(-0.2, 0.5);
     },
     update: function(){
       //This function is called to update the gamestate
@@ -49,12 +51,25 @@ var mainState={
       //If the turtle is out of the screen, restart game
       if (this.bird.y < 0 || this.bird.y > 490)
           this.restartGame();
+      if (this.bird.angle < 20)
+          this.bird.angle += 1;
       game.physics.arcade.overlap(
-              this.bird, this.pipes, this.restartGame, null, this);
+              this.bird, this.pipes, this.hitPipe, null, this);
     },
     jump: function(){
+        if (this.bird.alive === false)
+            return;
         //Add a Vertical velocity to the turtle
         this.bird.body.velocity.y = -350;
+        
+        //Create an animation on the bird sprite
+        var animation = game.add.tween(this.bird);
+        
+        //Change the angle of the bird withn a 100 ms timeframe
+        animation.to({angle : -20}, 100);
+        
+        //Start the animation
+        animation.start();
     },
     restartGame: function(){
         //Start the 'Main' state, restarting the game
@@ -84,10 +99,26 @@ var mainState={
         //Add 6 Pipes
         //With an hole  at position 'hole' and 'hole+1'
         for(var i = 0; i<8; i++)
-            if(i != hole && i != hole + 1)
+            if(i !== hole && i !== hole + 1)
                 this.addOnePipe(400,i*60+10);
         this.score += 1;
         this.labelScore.text = this.score;
+    },
+    hitPipe: function(){
+        //If the bird already hit a pipe, do nothing.
+        if (this.bird.alive === false)
+            return;
+        //set the alive propety of the bird to false
+        this.bird.alive = false;
+        
+        //Prevent new pipes from being generated
+        game.time.events.remove(this.timer);
+        
+        //Stop all movement of pipre
+        this.pipes.forEach(function(p){
+            p.body.velocity.x = 0;
+        }, this);
+        
     }
 };
 //Initializing Phaser module and create "playspace"
