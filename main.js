@@ -7,6 +7,7 @@ var mainState={
         //Location to load ressources like images/sounds
         game.load.image('bird', 'assets/bird.png');
         game.load.image('pipe', 'assets/pipe.png');
+        game.load.audio('jump', 'assets/jump.wav');
     },
     create: function(){
         //Initialize Score
@@ -43,6 +44,9 @@ var mainState={
         
         //Set default anchor on the bird sprite
         this.bird.anchor.setTo(-0.2, 0.5);
+        
+        //Add the jump sound to the game
+        this.jumpSound = game.add.audio('jump');
     },
     update: function(){
       //This function is called to update the gamestate
@@ -67,6 +71,9 @@ var mainState={
         
         //Change the angle of the bird withn a 100 ms timeframe
         animation.to({angle : -20}, 100);
+        
+        //Add sound to jump animation
+        this.jumpSound.play(); 
         
         //Start the animation
         animation.start();
